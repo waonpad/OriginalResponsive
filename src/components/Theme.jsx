@@ -2,6 +2,15 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { green, grey, yellow } from '@mui/material/colors';
 
 export const globalTheme = createTheme({
+    breakpoints: {
+        values: {
+            xs: 0,
+            sm: 600,
+            md: 769,
+            lg: 1000,
+            xl: 1920,
+        },
+    },
     // palette: {
     //     // mode: 'dark',
     //     primary: {

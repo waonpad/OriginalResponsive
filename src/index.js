@@ -3,7 +3,8 @@ import { BrowserRouter, Routes, Route, } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import View from './components/View';
 import Header from './components/Header';
-import Example from "./components/Example";
+import Example from "./pages/Example";
+import Top from "./pages/Top";
 
 const Root = () => {
     return (
@@ -11,7 +12,8 @@ const Root = () => {
             <BrowserRouter>
                 <Header>
                     <Routes>
-                        <Route path='/' exact element={<Example />} />
+                        <Route path='/' exact element={<Top />} />
+                        <Route path='/example' exact element={<Example />} />
                     </Routes>
                 </Header>
             </BrowserRouter>
