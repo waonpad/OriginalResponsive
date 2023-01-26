@@ -15,9 +15,10 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { Backdrop, CircularProgress } from '@mui/material';
+import Top from '../pages/Top';
 
 import MainVisual from './MainVisual';
-import { useWindowDimensions } from '../hooks/WindowDimensions';
+import { useElementClientRect } from '../hooks/ElementClientRect';
 
 const drawerWidth = 240;
 const navItems = ['Home', 'About', 'Contact'];
@@ -25,15 +26,7 @@ const navItems = ['Home', 'About', 'Contact'];
 function Header(props) {
     const { window, children } = props;
     const [mobileOpen, setMobileOpen] = useState(false);
-    const headerElm = useRef(null);
-    const { width, height } = useWindowDimensions();
-    const [headerElmBoundingClientRect, setHeaderElmBoundingClientRect] = useState(null);
-
-    useEffect(() => {
-        const status = headerElm.current.getBoundingClientRect();
-        // console.log(status);
-        setHeaderElmBoundingClientRect(status);
-    }, [headerElm, width, height]);
+    const {ref, client_rect, setDOMLoading} = useElementClientRect();
 
     const handleDrawerToggle = () => {
         setMobileOpen((prevState) => !prevState);
@@ -61,7 +54,7 @@ function Header(props) {
 
     return (
         <Box sx={{ display: 'flex' }}>
-            <AppBar component="nav" ref={headerElm}>
+            <AppBar component="nav" ref={ref}>
                 <Toolbar>
                 <Typography
                     variant="h6"
@@ -108,16 +101,16 @@ function Header(props) {
             <Box component="main">
                 <Toolbar />
                 {
-                    headerElmBoundingClientRect === null ?
+                    client_rect === null ?
                     <Backdrop open={true}>
                         <CircularProgress/>
                     </Backdrop>
                     :
                     <React.Fragment>
                         <Box sx={{width: '100vw'}}>
-                            <MainVisual headerElmBoundingClientRect={headerElmBoundingClientRect} />
+                            <MainVisual headerElmBoundingClientRect={client_rect} />
+                            <Top headerElmBoundingClientRect={client_rect} />
                         </Box>
-                        {children}
                     </React.Fragment>
                 }
             </Box>
