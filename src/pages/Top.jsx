@@ -1,28 +1,60 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Box, Container, Grid, Card } from '@mui/material';
 import { useWindowDimensions } from '../hooks/WindowDimensions';
 import Agenda from '../components/Agenda';
 import Gallery from '../components/Gallery';
 import ButtonGroupPrimary from '../components/ButtonGroupPrimary';
-import MainArticle from '../components/MainArticle';
+import Article from '../components/Article';
 import { useElementClientRect } from '../hooks/ElementClientRect';
+import useElementChildScroll from '../hooks/ElementChildScroll';
 
 const Top = (props) => {
     const {headerElmBoundingClientRect} = props;
 
     const {breakpoint} = useWindowDimensions();
-    const {ref, client_rect, setDOMLoading} = useElementClientRect();
+    const ref = useRef(null);
+    const {clientRect, setDOMLoading} = useElementClientRect(ref);
     const [dispComponent, setDispComponent] = useState('gallery');
+    const [agendaScrollTop, setAgendaScrollTop] = useState(0);
+    const [articleScrollTop, setArticleScrollTop] = useState(0);
+    const [galleryScrollTop, setGalleryScrollTop] = useState(0);
+    const articleSectionRefs = useRef({});
+    const galleryImageRefs = useRef({});
+    // const [currentSection, setCurrentSection] = useState('Summary');
+
+    const handleChangeAgendaScrollTop = (scrollTop) => {
+        setAgendaScrollTop(scrollTop);
+    }
+
+    const handleChangeArticleScrollTop = (scrollTop) => {
+        setArticleScrollTop(scrollTop);
+    }
+
+    const handleChangeGalleryScrollTop = (scrollTop) => {
+        setGalleryScrollTop(scrollTop);
+    }
 
     const handleChangeDispComponent = (event) => {
         setDispComponent(event.currentTarget.value);
+    }
+
+    const handleScrollIntoView = (event) => {
+        const key = event.currentTarget.id;
+        const targetArticle = articleSectionRefs.current[key];
+        targetArticle && articleSectionRefs.current[key].scrollIntoView({behavior: 'smooth', block: 'start'});
+
+        // 2つをスクロールしようとすると片方しかできない
+        // imageは、articleのスクロールに反応してスクロールされるべきだが、めんどくさそう
+
+        // const targetImage = galleryImageRefs.current[key];
+        // targetImage && galleryImageRefs.current[key].scrollIntoView({behavior: 'smooth', block: 'start'});
     }
 
     return (
         <Container maxWidth={false} sx={{'&.MuiContainer-root':{paddingTop: 1, paddingLeft: 1, paddingRight: 1}}}>
             <Grid container spacing={1}>
                 {/* 左 */}
-                <Grid item lg={2.5} sx={{display: {xs: 'none', lg: 'block'}, maxHeight: `calc(100vh - ${headerElmBoundingClientRect.height}px)`}}>
+                <Grid item lg={2.5} sx={{display: {xs: 'none', lg: 'block'}, minHeight: `calc(100vh - ${headerElmBoundingClientRect.height}px)`, maxHeight: `calc(100vh - ${headerElmBoundingClientRect.height}px)`}}>
                     <Card elevation={1} sx={{minHeight: 'calc(100% - 16px)', maxHeight: 'calc(100% - 16px)'}}>
                         <ButtonGroupPrimary
                             head={true}
@@ -34,16 +66,25 @@ const Top = (props) => {
                                 },
                             ]}
                         />
-                        {/* 形式が同じなので、右エリアのclientrectを流用 */}
-                        <Agenda parent_client_rect={client_rect} />
+                        {/* 形式が同じなので、右エリアのclientRectを流用 */}
+                        <Agenda
+                            parentClientRect={clientRect}
+                            storedAgendaScrollTop={agendaScrollTop}
+                            handleChangeAgendaScrollTop={handleChangeAgendaScrollTop}
+                            handleScrollIntoView={handleScrollIntoView}
+                        />
                     </Card>
                 </Grid>
                 {/* 中 */}
-                <Grid item xs={12} sm={8.5} md={8} lg={6.5} sx={{minHeight: '100%', maxHeight: `calc(100vh - ${headerElmBoundingClientRect.height}px)`}}>
-                    <MainArticle />
+                <Grid item xs={12} sm={8} md={8} lg={6.5} sx={{minHeight: `calc(100vh - ${headerElmBoundingClientRect.height}px)`, maxHeight: `calc(100vh - ${headerElmBoundingClientRect.height}px)`}}>
+                    <Article
+                        articleSectionRefs={articleSectionRefs}
+                        storedArticleScrollTop={articleScrollTop}
+                        handleChangeArticleScrollTop={handleChangeArticleScrollTop}
+                    />
                 </Grid>
                 {/* 右 */}
-                <Grid item sm={3.5} md={4} lg={3} sx={{display: {xs: 'none', sm: 'block'}, maxHeight: `calc(100vh - ${headerElmBoundingClientRect.height}px)`}}>
+                <Grid item sm={4} md={4} lg={3} sx={{display: {xs: 'none', sm: 'block'}, minHeight: `calc(100vh - ${headerElmBoundingClientRect.height}px)`, maxHeight: `calc(100vh - ${headerElmBoundingClientRect.height}px)`}}>
                     <Card elevation={1} sx={{minHeight: 'calc(100% - 16px)', maxHeight: 'calc(100% - 16px)'}} ref={ref}>
                         {
                             ['sm', 'md'].includes(breakpoint) ?
@@ -65,8 +106,22 @@ const Top = (props) => {
                                         },
                                     ]}
                                 />
-                                {dispComponent === 'agenda' && <Agenda parent_client_rect={client_rect} />}
-                                {dispComponent === 'gallery' && <Gallery parent_client_rect={client_rect} />}
+                                {dispComponent === 'agenda' &&
+                                    <Agenda
+                                        parentClientRect={clientRect}
+                                        storedAgendaScrollTop={agendaScrollTop}
+                                        handleChangeAgendaScrollTop={handleChangeAgendaScrollTop}
+                                        handleScrollIntoView={handleScrollIntoView}
+                                    />
+                                }
+                                {dispComponent === 'gallery' &&
+                                    <Gallery
+                                        parentClientRect={clientRect}
+                                        storedGalleryScrollTop={galleryScrollTop}
+                                        handleChangeGalleryScrollTop={handleChangeGalleryScrollTop}
+                                        galleryImageRefs={galleryImageRefs}
+                                    />
+                                }
                             </React.Fragment>
                             :
                             ['lg', 'xl'].includes(breakpoint) ?
@@ -81,7 +136,12 @@ const Top = (props) => {
                                         },
                                     ]}
                                 />
-                                <Gallery parent_client_rect={client_rect} />
+                                <Gallery
+                                    parentClientRect={clientRect}
+                                    storedGalleryScrollTop={galleryScrollTop}
+                                    handleChangeGalleryScrollTop={handleChangeGalleryScrollTop}
+                                    galleryImageRefs={galleryImageRefs}
+                                />
                             </React.Fragment>
                             :
                             <></>

@@ -1,139 +1,96 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
+import React, {useEffect, useRef} from 'react';
+import ListSubheader from '@mui/material/ListSubheader';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
-import { Card } from '@mui/material';
+import { Card, Box, ListItem } from '@mui/material';
+import useElementChildScroll from '../hooks/ElementChildScroll';
 
 export default function Agenda(props) {
-    const {parent_client_rect} = props;
+    const {parentClientRect, storedAgendaScrollTop, handleChangeAgendaScrollTop, handleScrollIntoView} = props;
+
+    const sectionsData = [
+        {
+            title: 'Summary',
+            text: '技術的には、先行するボーイングB-47で実証された諸要素を踏まえ大陸間爆撃機（ten ten Bomber）の航続力と兵装搭載力、亜音速の速度性能の機体である。ソ連圏内の目標を自由落下型核爆弾で攻撃するために作られたが、ベトナム戦争では、第二次世界大戦で投下された爆弾を大きく上回る量の絨毯爆撃を行い「死の鳥」と恐れられた。\n戦略核攻撃に使用するため、機体中央部は爆弾倉となっており、大型で大重量の初期の核爆弾を搭載可能。初期型は大型の水素爆弾のみの搭載だったが、ベトナム戦争の頃から一部の機体は、通常の自由落下爆弾も搭載可能に改造された。後期型のG型・H型においては、空中発射型の巡航ミサイル（当初はAGM-28 ハウンド・ドッグ、後にSRAMやALCM。いずれも核弾頭装備）を主要兵装としていた。兵器は胴体内の爆弾倉のほか、主翼内側下のパイロンに追加搭載も可能である。また、初期型はターボジェットエンジンを装備していたが、後期型はターボファンエンジンに換装し燃費が向上、航続距離の延長を図った。\n降着装置はB-47から踏襲したタンデム式の変形である。機体下部に複列タンデムに並んだ4つの主脚と翼端を支えるアウトリガーを備えている。B-52の主脚はそれぞれがステアリング可能だという点で特徴的である。これは慣性航法装置により計算され、風上を向いている機首方向とは別に主脚を実際の進行方向（滑走路の向き）に自動的に合わせることにより横風着陸（クラブランディング）を容易にし、着陸時の横滑りによるタイヤの損傷（カット・コード）を防止するように工夫されている。\n冷戦の激化とソ連による奇襲核攻撃を恐れたアメリカは、複数のB-52を常に滞空させることにより敵の核攻撃による全滅を防ぎ、いつでも共産圏への報復核攻撃を可能とした「戦略パトロール」(Chrome Dome)を1962年から実施していたが、実弾頭の核兵器搭載によるパトロールは、複数回の墜落による放射能汚染事故を起こし、1968年のチューレ空軍基地米軍機墜落事故を契機に取りやめられた。\n一層の攻撃力強化のための空中発射弾道ミサイル「スカイボルト」搭載計画もあったが、技術的困難から1962年に中止された。以後潜水艦発射弾道ミサイルや巡航ミサイルの発展により、この種の計画の検討は行われていない。\nなお、冷戦時においてもイギリスや日本、ドイツなどの西側諸国や、革命前のイランなどの友好国の空軍への導入実績はなく、現在に至るまでアメリカ空軍以外で導入、運用実績はない。\n2022年時点において、過去数度の近代化改装を施した上でも3-4世代前の古い技術による機体ではあるが、いわゆる「枯れた技術」を基礎としていることから兵器として最も重要な信頼性に結びついており、兵器の搭載能力・米軍再編による戦力再評価などの諸要因もあり戦略・戦術両面における評価が高く、1962年に最終号機を納入し終えてから半世紀以上経つが未だに運用中で、これからも適宜改修し2045年までの運用を予定している。2021年現在、76機保有している。'
+        },
+        {
+            title: 'Development',
+            text: 'アメリカ軍は時速500km、航続距離8,000kmを超える大型爆撃機の検討を第二次世界大戦中の1945年から行っていた。ボーイングにおいても大型爆撃機の検討・提案を行い、1946年にターボプロップエンジンを6基搭載したモデル462案が採用されXB-52としての開発が開始された。モデル462案には間もなく修正が加えられ、エンジンを4基に変更したモデル464案となっている。\nその後も核兵器運用能力の追加などの改良が加えられ、1946年中にモデル464-16案や464-17案が検討された。さらに空中給油能力などの改良が加えられ、1948年10月にはターボプロップエンジンを取りやめ、後退翼とジェットエンジンを装備したモデル464-49案が作成された。モデル464-49案を改良したモデル464-67案を基に試作機の製造が開始された。\n1950年代に入ると、次期戦略爆撃機をめぐる非公式の競争があった。コンベアはボーイングの計画がゼロから始まるため失敗するリスクがあることに着目し、B-36の部品を共有したYB-60（XB-36G）を試作して、YB-52と競い合った。だが、同じエンジンを同じ数だけ使用しているにもかかわらず、YB-52はYB-60より160km/h以上も速く、操縦が比較的容易であった。唯一YB-52が負けていたのは爆弾搭載量で、YB-52が43,000ポンド（20t）に対してYB-60は72,000ポンド（33t）であったが、アメリカ空軍はそれについては重要視しなかった。そのため、B-60は不採用となり、B-52が次期戦略爆撃機として採用されることになった。'
+        },
+        {
+            title: 'Operational history',
+            subSections: [
+                {
+                    title: 'Cold War',
+                    text: '冷戦期中、B-52は戦略パトロール任務（airborne alert duty）についた。B-52はソ連の国境の周辺で24時間365日遊弋し、核戦争の際に先制攻撃や報復攻撃を即時行えるように待機していた。\n1966年1月17日1機のB-52GとKC-135A空中給油機がスペイン上空で空中衝突事故（パロマレス米軍機墜落事故）を起こした。4発の4メガトン級の核爆弾B28は最終的には回収された。4発の内2発は弾頭の起爆用の通常爆薬が爆発を起こしており、プルトニウムとウランが飛散していた。安全装置は墜落の衝撃と爆発に耐えて核爆発だけは避けられた。事故後、1,400トンの汚染された土がアメリカに運ばれた。衝突事故と土壌汚染のリスクの高さから、以降常時飛行のパトロールは中止された。2006年に事故による汚染の調査と除去についてアメリカとスペインの間で協定が結ばれた。\n1968年1月22日、同じく4発の核爆弾を搭載したB-52Gがグリーンランドのチューレ空軍基地に緊急着陸しようとして海氷上に墜落した（チューレ空軍基地米軍機墜落事故）。それによる火災は放射能汚染を発生させ、除去には同年9月まで要した。\n1973年10月の第四次中東戦争ではソ連がエジプトとシリア側として参戦すると表明した。対抗措置としてリチャード・ニクソン大統領は軍の警戒レベルをデフコン3に引き上げた。その一環として、メルヴィン・レアード国防長官はB-52部隊に即時の戦闘態勢を命じ、燃料と兵器を満載したB-52がグリーンランドの周囲で上空待機することとなった。これを受けてソ連は参戦を断念した。\nB-52は陸上配備ミサイル、潜水艦搭載ミサイルと共に戦略核兵器の三本の柱の一つであり続けた。また戦略パトロール任務を外れたG型の一部は、AGM-84 ハープーン空対艦ミサイルを搭載可能に改造され、洋上哨戒を行い、ソビエト海軍の艦船に対抗した。\nB-52の代替機としてB-1B ランサーが登場したものの、B-52の初期型とFB-111の代替に終わった。\nソビエト連邦の崩壊後、第一次戦略兵器削減条約（START I）により365機のB-52が廃棄されることとなり、ロシアは偵察衛星及び監視員によって廃棄の進行状況を監視した。\n1991年にB-52は戦略航空軍団において24時間の警戒態勢から解かれた。'
+                },
+                {
+                    title: 'Combat',
+                    text: 'B-52は核兵器ではなく、通常爆弾や通常弾頭ミサイルを搭載して多くの実戦に参加している。\n初参戦となったのはベトナム戦争である。1965年2月7日、リンドン・ジョンソン大統領はアメリカ軍将校殺害の報復として解放戦線勢力圏と同時に、トンキン湾事件報復を口実として首都・ハノイ市などの北ベトナム中枢への爆撃（北爆）を命令。いわゆる「フレイミング・ダート作戦」で、3月からは本格的な北爆である「ローリング・サンダー作戦」が開始された。\nB-52は、グアム島や当時アメリカ統治下の沖縄本島のアメリカ軍基地から、北ベトナムまで長距離飛行し、絨毯爆撃を行って帰還した。参加したのは主に通常爆弾を大量に搭載可能に改造したD型で、100発以上の無誘導爆弾を満載して連日出撃した。\n北爆に向かうB-52の進路や機数はグアムや沖縄沖で、ソ連や中華人民共和国のレーダーを搭載した偽装漁船から逐次、北ベトナム軍の司令部に報告されていた。ベトナム戦争中、北ベトナム軍のMiG-19やMiG-21などの迎撃戦闘機や対空砲火、地対空ミサイルのほか、事故により31機のB-52が喪失した。だが、強力な電波妨害装置と大量の爆弾搭載量による度重なる爆撃で、ハノイをはじめとする北ベトナムの主要都市の橋や道路、発電所や浄水場などのインフラへ大きな被害を与え、戦後も長く市民生活に影響を残した。\n1968年に北爆を中断するが、その後、1972年5月8日に、リチャード・ニクソン大統領は北爆再開を決定した。いわゆる「ラインバッカー I作戦」である。この作戦は、圧倒的な航空戦力を使ってホーチミン・ルートを遮断し、アメリカ地上軍の削減と地上兵力の南ベトナム化を進め、また北ベトナム軍の戦力を徹底的に削ぐことにより、北ベトナム政府の態度を迅速に講和へ向けることを狙った作戦でもあった。アメリカ空軍は第二次世界大戦以来の本格的な戦略爆撃を行う事を決定し、軍民問わない無差別爆撃をした。本作戦では従来の垂れ流し的な戦力の逐次投入をやめて戦力の集中投入に切り替えた。特に12月18日に開始された「ラインバッカー II作戦」では、150機のB-52による700ソーティーにも及ぶ夜間絨毯爆撃でハノイやハイフォンを焼け野原にした。\nアメリカ軍による空爆は、北ベトナム国民のみならず南ベトナム国民にさえ大量の死傷者を出し、北ベトナム軍と国民にも、少なからず厭戦的な意識を植え付けた。北ベトナム軍にとって幸いなことに、クリスマス時の再度の北爆は、国際世論の猛反発を受け短期間で中止されたが、アメリカの目論見通り、この空爆は北ベトナム政府を講和交渉のテーブルにつかせ、パリ協定の締結に繋がることとなる。\nただしB-52も無傷では済まず、「ラインバッカー I、II」両作戦では北ベトナム側の猛反撃を受け、D型11機、G型6機がSA-2「ガイドライン」地対空ミサイルで撃墜される。特にG型は、東南アジア向け電子戦装備のD型に対し、核攻撃用の装備しかなく、12月18日から21日までの短期間で6機喪失の甚大な被害を受けた。これを受けて、G型はハノイ爆撃の任からは外されている。 一方で2機のB-52Dの尾部銃座の攻撃でMiG-21をそれぞれ1機ずつ撃墜している。\n湾岸戦争ではディエゴガルシア島などを基地にして、無誘導爆弾のみならず巡航ミサイルも使用し、35基のAGM-86C CALCMを発射した。\nその後、開発されたGPS/INS誘導爆弾（Joint Direct Attack Munition） 搭載により精密爆撃が可能となり、2001年のアフガニスタン侵攻および2003年のイラク戦争でもインド洋のディエゴガルシア島から発進し、JDAMを使用して爆撃を行った。\nこれらの冷戦下から冷戦後にかけて行われた戦争において、滞空時間が長く多量の爆弾を搭載できるB-52爆撃機の存在は高い評価を受けた。'
+                },
+                {
+                    title: 'Longer operation',
+                    text: 'B-52は2021年現在、原型のXB-52のロールアウト（1951年）から既に70年、H型の最終号機のロールアウト（1962年）から数えても半世紀以上に渡り配備が続いている。G型、H型で大幅な改良を受けたとはいえ、これほどの長寿は爆撃機としてはもちろん、航空機全般の中でも極めて異例といえる。ここまで長い運用は当初から予定されたものではなかった。これはB-52の後に様々なタイプの戦略爆撃機を開発・採用されながらも、B-52を完全に代替するものではなかったことによる。\nB-58超音速爆撃機は速力でB-52を遙かに上回ったが「高空を高速で飛行し、敵の防空網を突破する」という基本戦術が対空ミサイルの発達により価値を失い、また空対地ミサイルの運用能力がないなど進歩する兵器に対応ができず、短期間で姿を消した。マッハ3の超高速爆撃機XB-70は、高コストが災いして試作のみで終わった。またB-58、B-2などは、ペイロードでB-52に及ばなかった。\n結局、これらの新型機は超音速飛行やステルス性などの性能を要求され「多種多様な兵器を、大量に搭載し、遠方に投入・投下する」性能についてはB-52以上の内容を要求されることはなかった。また、盛り込まれた新技術は整備・維持の困難を招き、B-58やB-2のように、アメリカ本土以外の前線基地、例えば東南アジアや中東では運用がままならない機体もあった。調達・運用コストも総じて高価で、B-52を代替するのに必要な数を揃えることは困難だった。一方、新型機がことごとく行き詰まるのを尻目に、B-52はアメリカ空軍の圧倒的な航空優勢を背景に、その搭載能力と航続力を生かし、核兵器から、大量の通常爆弾、巡航ミサイルをはじめとする精密誘導兵器と、時代と共に進歩する兵器に柔軟に対応していった。\nまた、戦闘爆撃機・マルチロール機として出現したF-111やF-15E等が、かつての大型戦略爆撃機であるB-29を上回る搭載量を実現したことも影響している。F-111は当初目標の一つの制空戦闘機としてはものにならなかったものの、低空侵攻可能な戦闘爆撃機としては優秀であるため、対地攻撃任務に主眼を置いた戦術爆撃機として運用されてきた。さらに爆撃性能に特化し、この機体を戦略爆撃機として発展させたFB-111という派生型が開発されたこともある。核兵器自体も技術の進歩により小型化され、搭載・運用に必ずしも以前のような大型機を必要としなくなった。また機体単独で航続力を確保しなくても、空中給油技術の確立によって航続距離を延伸可能になったことも、戦闘機サイズの機体で戦略爆撃任務を担う事が可能になった一因である。\nより小型の機体で戦略爆撃機としての任務をほぼ代替できる以上、高価な大型戦略爆撃機を多数配備する意味は小さくなってしまった。空中給油に頼らない航続力や大型兵器の運用能力を生かした任務はニッチ的な状況に陥り、担当機種を新規に開発する必要性が大幅に薄れていく中で、現在に至るも旧式機であるB-52がコストの面において兵器としての価値を保持し続けることになっているのである。\nこうして、最後の「爆撃機らしい爆撃機」B-52は有力な後継が登場しないままに生き残り、減勢しながらもなおアメリカ空軍の爆撃機戦力の一翼を担い続けている。2009年現在使用されているB-52は最終量産型であるH型の71機のみだが、アメリカ空軍は今後も延命措置などを行い現役に留める予定である。当面は2045年までの予定とされるが、さらに延長される可能性もある。\n初期型のB-52が現役だった頃には「機長（多くは30歳代以上）より機体の方が年上」、あるいは「親子二代でB-52に乗っている」といった例がしばしば見られたと言うが、B-52の退役が先に延びるにつれ、このような例はますます増加していくことになろう。\nただし1機種だけ例外的存在がある。B-1は、ペイロードを含めてあらゆる性能でB-52を上回る、超音速戦略爆撃機である。A型では爆弾倉のレイアウトがまずく、大型のAGM-86B巡航ミサイルを機内搭載できなかったものの、B型ではレイアウトを変更し搭載可能となった。しかしこのB-1の性能は（特にアメリカに敵対する可能性のある陣営にとって）過剰なものとされ、第二次戦略兵器削減条約による制限により、現在は緊急近接航空支援という、当初の目論見とはまったく別の任務を担っている。'
+                },
+                {
+                    title: 'Henceforth',
+                    text: '2018年時点の計画では2050年代までの運用が予定されており、2052年まで続けば前例のない100年間に渡り実戦配備された航空機かつ正面装備となる。\nアメリカ空軍はB-52H型のうち、18機を年1機のペースで退役させる予定だった。しかし、2008年にグアム島で1機を事故喪失したため、2016年に保管中のB-52H（61-0007）が再生された。2016年5月16日にもグアム島で1機が墜落喪失したため、デイビスモンサン空軍基地で保管されていたB-52Hが再生され2020年12月14日に再び飛行した。さらに、一部の機体は電子戦用機EB-52に改造される予定である。\nB-52には今後も各種の延命措置や改造が計画・立案されている。大掛かりな内容では、高バイパス比ターボファンへのエンジン換装計画があり、これは主に航続距離の増加を狙ったものといわれる。この計画の候補として現在と同じ8エンジン機にするという案と、より大きく大推力のエンジン4つと換装する案が上がっている。ボーイング社は現在のTF33エンジン（出力17,000ポンド）8発を、ロールス・ロイス RB211 535E-4エンジン（出力40,000ポンド）4発に換装する案を提示している。エンジン数を減らす代わりに強力な大型エンジンを搭載し、燃費と出力を同時に改善することによって、航続距離とペイロードの向上が期待できるとしている。しかし性能の向上が見込めるとしても、エンジン換装には多額の投資を要する（ボーイング案の場合、1機あたり3,600万USドル、71機全てを改造する場合、トータル25億ドル余）ため、現在のTF33エンジンのままで維持した方がより低コストで合理的との試算もあり、エンジン換装が実現するかどうかは不明である。\n2015年3月8日、アメリカ空軍はアリゾナ州ツーソンの退役軍用機の集積場に保管されていた機体の運用を再開すると発表した。\n2018年2月、アメリカ空軍では戦略爆撃機の編成として、2020年代後半までにB-1とB-2を退役させ、エンジン換装などで延命したB-52を75機、新型のB-21を100機とする計画を発表した。\n2021年9月24日、P&WがTF33のサポートを2030年で打ち切る意向を示したことに伴い、B-52の換装用エンジンにロールス・ロイス F130（ロールス・ロイス BR725）が採用されたことが発表された。'
+                }
+            ],
+        }
+    ];
+
+    const agendaRef = useRef(null);
+    const agendaScrollTop = useElementChildScroll(agendaRef);
+    
+    useEffect(() => {
+        if(handleChangeAgendaScrollTop) {
+            console.log(agendaScrollTop)
+            handleChangeAgendaScrollTop(agendaScrollTop)
+        }
+    }, [agendaScrollTop])
+
+    useEffect(() => {
+        if(agendaRef && storedAgendaScrollTop) {
+            agendaRef.current.scrollTop = storedAgendaScrollTop;
+        }
+    }, [agendaRef])
 
     return (
         <Box sx={{ minWidth: '100%', bgcolor: 'background.paper'}}>
-            <List sx={{pt: 0, pb: 0, maxHeight: `calc(${parent_client_rect ? parent_client_rect.height : 0}px - 35px)`, overflow: 'auto'}}>
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda1" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda2" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda1" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda2" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda1" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda2" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda1" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda2" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda1" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda2" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda1" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda2" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda1" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda2" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda1" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda2" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda1" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda2" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda1" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                    <ListItemButton>
-                        <ListItemText primary="Agenda2" />
-                    </ListItemButton>
-                </ListItem>
-                <Divider />
+            <List ref={agendaRef} sx={{pt: 0, pb: 0, maxHeight: `calc(${parentClientRect ? parentClientRect.height : 0}px - 35px)`, overflow: 'auto', '&::-webkit-scrollbar': {display: 'none'}}}>
+                {
+                    sectionsData.map((section, index) => (
+                        <React.Fragment key={index}>
+                            <ListItem disablePadding>
+                                <ListItemButton id={section.title} onClick={handleScrollIntoView}>
+                                    <ListItemText primary={section.title} />
+                                </ListItemButton>
+                            </ListItem>
+                            <Divider />
+                            {
+                                section.subSections !== undefined &&
+                                <React.Fragment>
+                                    <List component="div" disablePadding>
+                                    {
+                                        section.subSections.map((subSection, index) => (
+                                            <React.Fragment>
+                                                <ListItemButton sx={{ pl: 4 }} key={index} id={subSection.title} onClick={handleScrollIntoView}>
+                                                    <ListItemText primary={subSection.title} />
+                                                </ListItemButton>
+                                                <Divider />
+                                            </React.Fragment>
+                                        ))
+                                    }
+                                    </List>
+                                </React.Fragment>
+                            }
+                        </React.Fragment>
+                    ))
+                }
             </List>
         </Box>
     );
