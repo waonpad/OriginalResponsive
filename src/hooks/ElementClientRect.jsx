@@ -1,16 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { useWindowDimensions } from "./WindowDimensions";
 
-export const useElementClientRect = () => {
-    const ref = useRef(null);
+export const useElementClientRect = (ref) => {
     const {width, height} = useWindowDimensions();
-    const [dom_loading, setDOMLoading] = useState(true);
-    const [client_rect, setClientRect] = useState(null);
+    const [domLoading, setDOMLoading] = useState(true);
+    const [clientRect, setClientRect] = useState(null);
 
     const getClientRect = () => {
         if(ref.current !== null) {
-            const client_rect = ref.current.getBoundingClientRect();
-            setClientRect(client_rect);
+            const clientRect = ref.current.getBoundingClientRect();
+            setClientRect(clientRect);
         }
     }
 
@@ -28,11 +27,10 @@ export const useElementClientRect = () => {
 
     useEffect(() => {
         getClientRect()
-    }, [dom_loading, ref, width, height])
+    }, [domLoading, ref, width, height])
 
     return {
-        ref,
-        client_rect,
+        clientRect,
         setDOMLoading
     }
 }

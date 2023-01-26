@@ -1,0 +1,24 @@
+import { useState, useEffect } from 'react';
+
+function useElementChildScroll(ref) {
+    const [scrollTop, setScrollTop] = useState(0);
+
+    useEffect(() => {
+        const node = ref.current;
+        if (!node) return;
+
+        function handleScroll() {
+        setScrollTop(node.scrollTop);
+        }
+
+        node.addEventListener('scroll', handleScroll);
+        
+        return () => {
+            node.removeEventListener('scroll', handleScroll);
+        };
+    }, [ref]);
+
+    return scrollTop;
+}
+
+export default useElementChildScroll;
