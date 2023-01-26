@@ -4,7 +4,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { globalTheme } from './Theme';
 
-const View = ({children}) => {
+function View({children}) {
 
     return (
         <ThemeProvider theme={globalTheme}>

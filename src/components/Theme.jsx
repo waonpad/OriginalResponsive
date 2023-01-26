@@ -11,16 +11,16 @@ export const globalTheme = createTheme({
             xl: 1920,
         },
     },
-    // palette: {
-    //     // mode: 'dark',
-    //     primary: {
-    //         main: green[400],
-    //         contrastText: '#fff'
-    //     },
-    //     background: {
-    //         default: '#f5f5f5',
-    //     },
-    // },
+    palette: {
+        // mode: 'dark',
+        // primary: {
+        //     main: green[400],
+        //     contrastText: '#fff'
+        // },
+        background: {
+            default: '#f5f5f5',
+        },
+    },
     // components: {
     //     MuiBackdrop: {
     //         defaultProps: {
