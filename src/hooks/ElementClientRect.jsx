@@ -19,9 +19,11 @@ export const useElementClientRect = (ref) => {
         };
 
         window.addEventListener("scroll", handleScroll);
+        window.addEventListener('resize', handleScroll);
 
         return () => {
-          window.removeEventListener("scroll", handleScroll);
+            window.removeEventListener("scroll", handleScroll);
+            window.removeEventListener("resize", handleScroll);
         };
     }, [])
 
