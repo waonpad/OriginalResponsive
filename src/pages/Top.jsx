@@ -6,21 +6,42 @@ import Gallery from '../components/Gallery';
 import ButtonGroupPrimary from '../components/ButtonGroupPrimary';
 import Article from '../components/Article';
 import { useElementClientRect } from '../hooks/ElementClientRect';
-import useElementChildScroll from '../hooks/ElementChildScroll';
+import useElementChildPositions from '../hooks/ElementChildPositions';
+
+// ウインドウのサイズを変えたり要素の一部が表示されていない時などに動かすとバグって思うような動作をしない
+// 位置取得の仕方が甘いのが原因だと思われる
 
 const Top = (props) => {
     const {headerElmBoundingClientRect} = props;
 
     const {breakpoint} = useWindowDimensions();
     const ref = useRef(null);
-    const {clientRect, setDOMLoading} = useElementClientRect(ref);
+    const {clientRect} = useElementClientRect(ref);
     const [dispComponent, setDispComponent] = useState('gallery');
     const [agendaScrollTop, setAgendaScrollTop] = useState(0);
     const [articleScrollTop, setArticleScrollTop] = useState(0);
     const [galleryScrollTop, setGalleryScrollTop] = useState(0);
+    const articleRef = useRef(null);
     const articleSectionRefs = useRef({});
+    const galleryRef = useRef(null);
     const galleryImageRefs = useRef({});
-    // const [currentSection, setCurrentSection] = useState('Summary');
+    const [currentSection, setCurrentSection] = useState('Summary');
+    const articleChildPositions = useElementChildPositions(articleRef, articleSectionRefs);
+    const galleryChildPositions = useElementChildPositions(galleryRef, galleryImageRefs);
+
+    const isEmpty = (obj) => {
+        return !Object.keys(obj).length;
+    }
+
+    useEffect(() => {
+        if(!isEmpty(galleryChildPositions) && (['lg', 'xl'].includes(breakpoint) || dispComponent === 'gallery')) {
+            const key = currentSection;
+            const targetImage = galleryChildPositions.filter((galleryChildPosition) => ( galleryChildPosition.key === key ));
+
+            console.log(targetImage);
+            targetImage[0] && galleryRef.current.scrollTo({top: targetImage[0].y, left: 0, behavior: 'smooth', block: 'start'});
+        }
+    }, [currentSection])
 
     const handleChangeAgendaScrollTop = (scrollTop) => {
         setAgendaScrollTop(scrollTop);
@@ -28,6 +49,18 @@ const Top = (props) => {
 
     const handleChangeArticleScrollTop = (scrollTop) => {
         setArticleScrollTop(scrollTop);
+          
+        if(!isEmpty(articleChildPositions)) {
+            const sortedArticleChildPositions = articleChildPositions.sort((a, b) => {
+                return a.y - b.y;
+            });
+            
+            const activeSections = sortedArticleChildPositions.filter((childPosition, index) => (
+                index === sortedArticleChildPositions.length - 1 ? articleScrollTop + 200 >= sortedArticleChildPositions[index].y : articleScrollTop + 200 >= sortedArticleChildPositions[index].y && articleScrollTop + 200 <= sortedArticleChildPositions[index + 1].y
+            ));
+
+            setCurrentSection(activeSections.map((activeSection) => activeSection.key)[activeSections.length - 1])
+        }
     }
 
     const handleChangeGalleryScrollTop = (scrollTop) => {
@@ -40,14 +73,9 @@ const Top = (props) => {
 
     const handleScrollIntoView = (event) => {
         const key = event.currentTarget.id;
-        const targetArticle = articleSectionRefs.current[key];
-        targetArticle && articleSectionRefs.current[key].scrollIntoView({behavior: 'smooth', block: 'start'});
 
-        // 2つをスクロールしようとすると片方しかできない
-        // imageは、articleのスクロールに反応してスクロールされるべきだが、めんどくさそう
-
-        // const targetImage = galleryImageRefs.current[key];
-        // targetImage && galleryImageRefs.current[key].scrollIntoView({behavior: 'smooth', block: 'start'});
+        const targetSection = articleChildPositions.filter((articleChildPosition) => ( articleChildPosition.key === key ));
+        targetSection[0] && articleRef.current.scrollTo({top: targetSection[0].y, left: 0, behavior: 'smooth', block: 'start'});
     }
 
     return (
@@ -72,12 +100,14 @@ const Top = (props) => {
                             storedAgendaScrollTop={agendaScrollTop}
                             handleChangeAgendaScrollTop={handleChangeAgendaScrollTop}
                             handleScrollIntoView={handleScrollIntoView}
+                            currentSection={currentSection}
                         />
                     </Card>
                 </Grid>
                 {/* 中 */}
                 <Grid item xs={12} sm={8} md={8} lg={6.5} sx={{minHeight: `calc(100vh - ${headerElmBoundingClientRect.height}px)`, maxHeight: `calc(100vh - ${headerElmBoundingClientRect.height}px)`}}>
                     <Article
+                        articleRef={articleRef}
                         articleSectionRefs={articleSectionRefs}
                         storedArticleScrollTop={articleScrollTop}
                         handleChangeArticleScrollTop={handleChangeArticleScrollTop}
@@ -112,10 +142,12 @@ const Top = (props) => {
                                         storedAgendaScrollTop={agendaScrollTop}
                                         handleChangeAgendaScrollTop={handleChangeAgendaScrollTop}
                                         handleScrollIntoView={handleScrollIntoView}
+                                        currentSection={currentSection}
                                     />
                                 }
                                 {dispComponent === 'gallery' &&
                                     <Gallery
+                                        galleryRef={galleryRef}
                                         parentClientRect={clientRect}
                                         storedGalleryScrollTop={galleryScrollTop}
                                         handleChangeGalleryScrollTop={handleChangeGalleryScrollTop}
@@ -137,6 +169,7 @@ const Top = (props) => {
                                     ]}
                                 />
                                 <Gallery
+                                    galleryRef={galleryRef}
                                     parentClientRect={clientRect}
                                     storedGalleryScrollTop={galleryScrollTop}
                                     handleChangeGalleryScrollTop={handleChangeGalleryScrollTop}

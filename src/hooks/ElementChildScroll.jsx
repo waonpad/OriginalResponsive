@@ -8,13 +8,15 @@ function useElementChildScroll(ref) {
         if (!node) return;
 
         function handleScroll() {
-        setScrollTop(node.scrollTop);
+            setScrollTop(node.scrollTop);
         }
 
         node.addEventListener('scroll', handleScroll);
+        node.addEventListener('resize', handleScroll);
         
         return () => {
             node.removeEventListener('scroll', handleScroll);
+            node.removeEventListener('resize', handleScroll);
         };
     }, [ref]);
 
