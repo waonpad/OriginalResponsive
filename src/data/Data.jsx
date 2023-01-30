@@ -44,7 +44,7 @@ export const itemData = [
     {
         img: 'Boeing_B-52_Stratofortress_evolution,_part_2.png',
         title: '機体の発展（2）。左からモデル464-49、464-67（YB-52とXB-52）、B-52A',
-        section: ' '
+        section: 'Development2'
     },
     {
         img: 'B-52_&_Tu-95.jpg',
@@ -56,7 +56,7 @@ export const itemData = [
         img: 'B52destroyed.jpg',
         title: 'START I批准により、アリゾナ州デビスモンサン空軍基地で廃棄処分されたB-52',
         section: 'Operational history',
-        subSection: ' '
+        subSection: 'Cold War2'
     },
     {
         img: 'B-52D(061127-F-1234S-017).jpg',
@@ -74,7 +74,7 @@ export const itemData = [
         img: 'B-52H_static_display_arms_06.jpg',
         title: 'B-52の搭載兵器',
         section: 'Operational history',
-        subSection: ' '
+        subSection: 'Longer operation2'
     },
     {
         img: 'B-52_and_16_other_planes_fly_over_Kitty_Hawk_in_formation_flight_August_14,_2007.jpg',

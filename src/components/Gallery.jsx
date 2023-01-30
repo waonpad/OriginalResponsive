@@ -40,7 +40,7 @@ export default function Gallery(props) {
                         />
                         <ImageListItemBar
                             title={<Typography variant="caption" sx={{whiteSpace: 'pre-line'}}>{item.title}</Typography>}
-                            subtitle={<span>{item.subSection ? item.subSection : item.section}</span>}
+                            // subtitle={<span>{item.subSection ? item.subSection : item.section}</span>}
                             position="below"
                         />
                     </ImageListItem>

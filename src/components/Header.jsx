@@ -15,10 +15,12 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { Backdrop, CircularProgress } from '@mui/material';
+import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
+import TocIcon from '@mui/icons-material/Toc';
 import Top from '../pages/Top';
-
 import MainVisual from './MainVisual';
 import { useElementClientRect } from '../hooks/ElementClientRect';
+import { sectionsData } from '../data/Data';
 
 const drawerWidth = 270;
 const navItems = ['Home', 'About', 'Contact'];
@@ -27,9 +29,54 @@ function Header(props) {
     const { window, children } = props;
 
     const projectName = 'Boeing B-52 Stratofortress';
+    const [agendaOpen, setAgendaOpen] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const ref = useRef(null);
     const {clientRect, setDOMLoading} = useElementClientRect(ref);
+
+    const handleAgendaToggle = () => {
+        setAgendaOpen((prevState) => !prevState);
+    }
+
+    const agenda = (
+        <Box onClick={handleAgendaToggle} sx={{ textAlign: 'center' }}>
+        <Typography variant="h6" sx={{ my: 2 }}>
+            Agenda
+        </Typography>
+        <Divider />
+            <List disablePadding>
+                {
+                    sectionsData.map((section, index) => (
+                        <React.Fragment key={index}>
+                            <ListItem disablePadding>
+                                <ListItemButton id={section.title}>
+                                    <ListItemText primary={section.title}/>
+                                </ListItemButton>
+                            </ListItem>
+                            <Divider />
+                            {
+                                section.subSections !== undefined &&
+                                <React.Fragment>
+                                    <List component="div" disablePadding>
+                                    {
+                                        section.subSections.map((subSection, index) => (
+                                            <React.Fragment key={index}>
+                                                <ListItemButton sx={{ pl: 4 }} id={subSection.title}>
+                                                    <ListItemText primary={subSection.title}/>
+                                                </ListItemButton>
+                                                <Divider />
+                                            </React.Fragment>
+                                        ))
+                                    }
+                                    </List>
+                                </React.Fragment>
+                            }
+                        </React.Fragment>
+                    ))
+                }
+            </List>
+        </Box>
+    );
 
     const handleDrawerToggle = () => {
         setMobileOpen((prevState) => !prevState);
@@ -41,7 +88,7 @@ function Header(props) {
             {projectName}
         </Typography>
         <Divider />
-        <List>
+        <List disablePadding>
                 {navItems.map((item) => (
                 <ListItem key={item} disablePadding>
                     <ListItemButton sx={{ textAlign: 'center' }}>
@@ -68,6 +115,15 @@ function Header(props) {
                 </Typography>
                 <IconButton
                     color="inherit"
+                    aria-label="open agenda"
+                    edge="end"
+                    onClick={handleAgendaToggle}
+                    sx={{ display: { md: 'none' }, mr: 1 }}
+                >
+                    <TocIcon />
+                </IconButton>
+                <IconButton
+                    color="inherit"
                     aria-label="open drawer"
                     edge="end"
                     onClick={handleDrawerToggle}
@@ -84,6 +140,23 @@ function Header(props) {
                 </Box>
                 </Toolbar>
             </AppBar>
+            <Box component="nav">
+                <Drawer
+                    container={container}
+                    variant="temporary"
+                    open={agendaOpen}
+                    onClose={handleAgendaToggle}
+                    ModalProps={{
+                        keepMounted: true, // Better open performance on mobile.
+                    }}
+                    sx={{
+                        display: { xs: 'block', md: 'none' },
+                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+                    }}
+                >
+                    {agenda}
+                </Drawer>
+            </Box>
             <Box component="nav">
                 <Drawer
                     container={container}

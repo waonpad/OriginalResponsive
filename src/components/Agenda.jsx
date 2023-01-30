@@ -10,7 +10,7 @@ import useElementChildScroll from '../hooks/ElementChildScroll';
 import { sectionsData } from '../data/Data';
 
 export default function Agenda(props) {
-    const {parentClientRect, storedAgendaScrollTop, handleChangeAgendaScrollTop, handleScrollIntoView, currentSection} = props;
+    const {parentClientRect, storedAgendaScrollTop, handleChangeAgendaScrollTop, handleArticleScrollTo, currentSection} = props;
 
     const agendaRef = useRef(null);
     const agendaScrollTop = useElementChildScroll(agendaRef);
@@ -35,7 +35,7 @@ export default function Agenda(props) {
                     sectionsData.map((section, index) => (
                         <React.Fragment key={index}>
                             <ListItem disablePadding>
-                                <ListItemButton id={section.title} onClick={handleScrollIntoView}>
+                                <ListItemButton id={section.title} onClick={handleArticleScrollTo}>
                                     <ListItemText primary={section.title} primaryTypographyProps={{fontWeight: currentSection === section.title ? 'bold' : 'normal'}} />
                                 </ListItemButton>
                             </ListItem>
@@ -47,7 +47,7 @@ export default function Agenda(props) {
                                     {
                                         section.subSections.map((subSection, index) => (
                                             <React.Fragment key={index}>
-                                                <ListItemButton sx={{ pl: 4 }} id={subSection.title} onClick={handleScrollIntoView}>
+                                                <ListItemButton sx={{ pl: 4 }} id={subSection.title} onClick={handleArticleScrollTo}>
                                                     <ListItemText primary={subSection.title} primaryTypographyProps={{fontWeight: currentSection === subSection.title ? 'bold' : 'normal'}} />
                                                 </ListItemButton>
                                                 <Divider />
