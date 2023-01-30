@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Container, Grid, Card } from '@mui/material';
+import { Box, Container, Grid, Card, Fab, Dialog, Typography, ImageList, ImageListItem, ImageListItemBar } from '@mui/material';
+import CollectionsIcon from '@mui/icons-material/Collections';
 import { useWindowDimensions } from '../hooks/WindowDimensions';
 import Agenda from '../components/Agenda';
 import Gallery from '../components/Gallery';
@@ -7,14 +8,12 @@ import ButtonGroupPrimary from '../components/ButtonGroupPrimary';
 import Article from '../components/Article';
 import { useElementClientRect } from '../hooks/ElementClientRect';
 import useElementChildPositions from '../hooks/ElementChildPositions';
-
-// ウインドウのサイズを変えたり要素の一部が表示されていない時などに動かすとバグって思うような動作をしない
-// 位置取得の仕方が甘いのが原因だと思われる
+import { itemData } from '../data/Data';
 
 const Top = (props) => {
     const {headerElmBoundingClientRect} = props;
 
-    const {breakpoint} = useWindowDimensions();
+    const {width, height, breakpoint} = useWindowDimensions();
     const ref = useRef(null);
     const {clientRect} = useElementClientRect(ref);
     const [dispComponent, setDispComponent] = useState('gallery');
@@ -25,23 +24,14 @@ const Top = (props) => {
     const articleSectionRefs = useRef({});
     const galleryRef = useRef(null);
     const galleryImageRefs = useRef({});
-    const [currentSection, setCurrentSection] = useState('Summary');
     const articleChildPositions = useElementChildPositions(articleRef, articleSectionRefs);
     const galleryChildPositions = useElementChildPositions(galleryRef, galleryImageRefs);
+    const [currentSection, setCurrentSection] = useState('Summary');
+    const [galleryDialogOpen, setGalleryDialogOpen] = useState(false);
 
     const isEmpty = (obj) => {
         return !Object.keys(obj).length;
     }
-
-    useEffect(() => {
-        if(!isEmpty(galleryChildPositions) && (['lg', 'xl'].includes(breakpoint) || dispComponent === 'gallery')) {
-            const key = currentSection;
-            const targetImage = galleryChildPositions.filter((galleryChildPosition) => ( galleryChildPosition.key === key ));
-
-            console.log(targetImage);
-            targetImage[0] && galleryRef.current.scrollTo({top: targetImage[0].y, left: 0, behavior: 'smooth', block: 'start'});
-        }
-    }, [currentSection])
 
     const handleChangeAgendaScrollTop = (scrollTop) => {
         setAgendaScrollTop(scrollTop);
@@ -49,18 +39,7 @@ const Top = (props) => {
 
     const handleChangeArticleScrollTop = (scrollTop) => {
         setArticleScrollTop(scrollTop);
-          
-        if(!isEmpty(articleChildPositions)) {
-            const sortedArticleChildPositions = articleChildPositions.sort((a, b) => {
-                return a.y - b.y;
-            });
-            
-            const activeSections = sortedArticleChildPositions.filter((childPosition, index) => (
-                index === sortedArticleChildPositions.length - 1 ? articleScrollTop + 200 >= sortedArticleChildPositions[index].y : articleScrollTop + 200 >= sortedArticleChildPositions[index].y && articleScrollTop + 200 <= sortedArticleChildPositions[index + 1].y
-            ));
-
-            setCurrentSection(activeSections.map((activeSection) => activeSection.key)[activeSections.length - 1])
-        }
+        handleChnageCurrentSection();
     }
 
     const handleChangeGalleryScrollTop = (scrollTop) => {
@@ -71,15 +50,64 @@ const Top = (props) => {
         setDispComponent(event.currentTarget.value);
     }
 
-    const handleScrollIntoView = (event) => {
-        const key = event.currentTarget.id;
+    useEffect(() => {
+        handleGalleryScrollTo();
+    }, [currentSection])
 
-        const targetSection = articleChildPositions.filter((articleChildPosition) => ( articleChildPosition.key === key ));
-        targetSection[0] && articleRef.current.scrollTo({top: targetSection[0].y, left: 0, behavior: 'smooth', block: 'start'});
+    const handleGalleryScrollTo = () => {
+        if(!isEmpty(galleryChildPositions)) {
+            const key = currentSection;
+
+            const target = galleryChildPositions.filter((childPosition) => (
+                childPosition.key === key
+            ))[0];
+
+            if(target) {
+                const top = target.y + galleryScrollTop;
+                galleryRef.current && galleryRef.current.scrollTo({top: top, left: 0, behavior: 'smooth'})
+            }
+        }
+    }
+
+    const handleArticleScrollTo = (event) => {
+        if(!isEmpty(articleChildPositions)) {
+            const key = event.currentTarget.id;
+            
+            const target = articleChildPositions.filter((childPosition) => (
+                childPosition.key === key
+            ))[0];
+
+            if(target) {
+                const top = target.y + articleScrollTop;
+                articleRef.current && articleRef.current.scrollTo({top: top, left: 0, behavior: 'smooth'})
+            }
+        }
+    }
+
+    const handleChnageCurrentSection = () => {
+        if(!isEmpty(articleChildPositions)) {
+            const sortedArticleChildPositions = articleChildPositions.sort((a, b) => {
+                return a.y - b.y;
+            });
+            
+            const activeSections = sortedArticleChildPositions.filter((childPosition, index) => (
+                articleScrollTop + childPosition.y + sortedArticleChildPositions[0].y <= 100
+            ));
+
+            setCurrentSection(activeSections.map((activeSection) => activeSection.key)[activeSections.length - 1])
+        }
+    }
+
+    const handleGalleryDialogOpen = () => {
+        setGalleryDialogOpen(true);
+    }
+
+    const handleGalleryDialogClose = () => {
+        setGalleryDialogOpen(false);
     }
 
     return (
-        <Container maxWidth={false} sx={{'&.MuiContainer-root':{paddingTop: 1, paddingLeft: 1, paddingRight: 1}}}>
+        <Container maxWidth={false} sx={{position: 'relative', '&.MuiContainer-root':{paddingTop: 1, paddingLeft: 1, paddingRight: 1}}}>
             <Grid container spacing={1}>
                 {/* 左 */}
                 <Grid item lg={2.5} sx={{display: {xs: 'none', lg: 'block'}, minHeight: `calc(100vh - ${headerElmBoundingClientRect.height}px)`, maxHeight: `calc(100vh - ${headerElmBoundingClientRect.height}px)`}}>
@@ -99,7 +127,7 @@ const Top = (props) => {
                             parentClientRect={clientRect}
                             storedAgendaScrollTop={agendaScrollTop}
                             handleChangeAgendaScrollTop={handleChangeAgendaScrollTop}
-                            handleScrollIntoView={handleScrollIntoView}
+                            handleArticleScrollTo={handleArticleScrollTo}
                             currentSection={currentSection}
                         />
                     </Card>
@@ -141,7 +169,7 @@ const Top = (props) => {
                                         parentClientRect={clientRect}
                                         storedAgendaScrollTop={agendaScrollTop}
                                         handleChangeAgendaScrollTop={handleChangeAgendaScrollTop}
-                                        handleScrollIntoView={handleScrollIntoView}
+                                        handleArticleScrollTo={handleArticleScrollTo}
                                         currentSection={currentSection}
                                     />
                                 }
@@ -182,6 +210,55 @@ const Top = (props) => {
                     </Card>
                 </Grid>
             </Grid>
+            <Dialog
+                onClose={handleGalleryDialogClose}
+                open={galleryDialogOpen}
+                PaperProps={{
+                    style: {
+                        boxShadow: 'none',
+                        minWidth: '95vw',
+                        minHeight: '100vh',
+                        backgroundColor: 'transparent'
+                    }
+                }}
+                BackdropProps={{
+                    style: {
+                        backgroundColor: '#000',
+                        opacity: 0.7
+                    }
+                }}
+                onClick={handleGalleryDialogClose}
+            >
+                <ImageList cols={2}>
+                {itemData.map((item) => (
+                    <Box key={item.img}>
+                        <ImageListItem sx={{width: `${width ? (width * 0.94) / 2 : 0}px`}}>
+                            <img
+                                src={`${window.location.origin}/images/B52/${item.img}`}
+                                alt={item.title}
+                                loading="lazy"
+                            />
+                            <ImageListItemBar
+                                title={<Typography variant="caption" color='#fff' fontSize={5} sx={{whiteSpace: 'pre-line'}}>{item.title}</Typography>}
+                                position="below"
+                            />
+                        </ImageListItem>
+                    </Box>
+                ))}
+                </ImageList>
+            </Dialog>
+            <Fab
+                color='primary'
+                sx={{
+                    display: {xs: 'flex', sm: 'none'},
+                    position: 'fixed',
+                    bottom: '16px',
+                    right: '16px'
+                }}
+                onClick={handleGalleryDialogOpen}
+            >
+                <CollectionsIcon />
+            </Fab>
         </Container>
     )
 }
