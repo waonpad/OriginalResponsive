@@ -21,13 +21,18 @@ export const globalTheme = createTheme({
             default: '#f5f5f5',
         },
     },
-    // components: {
-    //     MuiBackdrop: {
-    //         defaultProps: {
-    //             sx: {
-    //                 backgroundColor: '#f5f5f5',
-    //             }
-    //         }
-    //     }
-    // }
+    components: {
+        MuiCssBaseline: {
+            styleOverrides: {
+                'img': {verticalAlign: 'bottom'}
+            }
+        },
+        // MuiBackdrop: {
+        //     defaultProps: {
+        //         sx: {
+        //             backgroundColor: '#f5f5f5',
+        //         }
+        //     }
+        // }
+    }
 });

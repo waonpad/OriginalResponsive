@@ -9,13 +9,15 @@ import Divider from '@mui/material/Divider';
 import { Card, Grid, Typography } from '@mui/material';
 import useElementChildScroll from '../hooks/ElementChildScroll';
 import useElementChildPositions from '../hooks/ElementChildPositions';
-import { sectionsData } from '../data/Data';
+import { useElementClientRect } from '../hooks/ElementClientRect';
+import { sectionsData, itemData } from '../data/Data';
 
 export default function Article(props) {
     const {articleRef, storedArticleScrollTop, handleChangeArticleScrollTop, articleSectionRefs} = props;
 
     // const articleRef = useRef(null);
     const articleScrollTop = useElementChildScroll(articleRef);
+    const {clientRect} = useElementClientRect(articleRef);
     
     useEffect(() => {
         if(handleChangeArticleScrollTop) {
@@ -45,9 +47,20 @@ export default function Article(props) {
                             </Typography>
                             {
                                 section.subSections === undefined ?
-                                <Typography variant="body1" sx={{whiteSpace: 'pre-line'}} gutterBottom>
-                                    {section.text}
-                                </Typography>
+                                <Box>
+                                    <Box sx={{float: 'right', ml: 0.5}}>
+                                        <img
+                                            // width={`${clientRect ? clientRect.width / 3 : 0}px`}
+                                            height={`${24 * 5 - 1.5}px`} // 24はfontSize * lineHeight // 余分な下の隙間を作らないようにheight基準
+                                            src={`${window.location.origin}/images/B52/${itemData.filter((item) => (item.section === section.title))[0].img}`}
+                                            alt={itemData.filter((item) => (item.section === section.title))[0].title}
+                                            loading="lazy"
+                                        />
+                                    </Box>
+                                    <Typography variant="body1" sx={{whiteSpace: 'pre-line'}} gutterBottom>
+                                        {section.text}
+                                    </Typography>
+                                </Box>
                                 :
                                 <Grid container spacing={1}>
                                     {
@@ -56,9 +69,20 @@ export default function Article(props) {
                                                 <Typography variant="h6" gutterBottom>
                                                     {subSection.title}
                                                 </Typography>
-                                                <Typography variant="body1" sx={{whiteSpace: 'pre-line'}} gutterBottom>
-                                                    {subSection.text}
-                                                </Typography>
+                                                <Box>
+                                                    <Box sx={{float: 'right', ml: 0.5}}>
+                                                        <img
+                                                            // width={`${clientRect ? clientRect.width / 3 : 0}px`}
+                                                            height={`${24 * 5 - 1.5}px`} // 24はfontSize * lineHeight // 余分な下の隙間を作らないようにheight基準
+                                                            src={`${window.location.origin}/images/B52/${itemData.filter((item) => (item.subSection === subSection.title))[0].img}`}
+                                                            alt={itemData.filter((item) => (item.subSection === subSection.title))[0].title}
+                                                            loading="lazy"
+                                                        />
+                                                    </Box>
+                                                    <Typography variant="body1" sx={{whiteSpace: 'pre-line'}} gutterBottom>
+                                                        {subSection.text}
+                                                    </Typography>
+                                                </Box>
                                             </Grid>
                                         ))
                                     }
