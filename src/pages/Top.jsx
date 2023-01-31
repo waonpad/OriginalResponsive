@@ -239,6 +239,7 @@ const Top = (props) => {
                                 loading="lazy"
                             />
                             <ImageListItemBar
+                                sx={{'& .MuiImageListItemBar-titleWrap': {paddingTop: 0}}}
                                 title={<Typography variant="caption" color='#fff' fontSize={5} sx={{whiteSpace: 'pre-line'}}>{item.title}</Typography>}
                                 position="below"
                             />

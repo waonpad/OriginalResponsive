@@ -39,6 +39,7 @@ export default function Gallery(props) {
                             loading="lazy"
                         />
                         <ImageListItemBar
+                            sx={{'& .MuiImageListItemBar-titleWrap': {paddingTop: 0}}}
                             title={<Typography variant="caption" sx={{whiteSpace: 'pre-line'}}>{item.title}</Typography>}
                             // subtitle={<span>{item.subSection ? item.subSection : item.section}</span>}
                             position="below"
