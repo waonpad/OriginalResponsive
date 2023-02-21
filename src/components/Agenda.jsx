@@ -1,12 +1,10 @@
 import React, {useEffect, useRef} from 'react';
-import ListSubheader from '@mui/material/ListSubheader';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import { Card, Box, ListItem } from '@mui/material';
-import useElementChildScroll from '../hooks/ElementChildScroll';
+import useElementChildScroll from '../hooks/useElementChildScroll';
 import { sectionsData } from '../data/Data';
 
 export default function Agenda(props) {

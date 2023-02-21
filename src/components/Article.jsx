@@ -1,15 +1,8 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Box from '@mui/material/Box';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
 import { Card, Grid, Typography } from '@mui/material';
-import useElementChildScroll from '../hooks/ElementChildScroll';
-import useElementChildPositions from '../hooks/ElementChildPositions';
-import { useElementClientRect } from '../hooks/ElementClientRect';
+import useElementChildScroll from '../hooks/useElementChildScroll';
+import { useElementClientRect } from '../hooks/useElementClientRect';
 import { sectionsData, itemData } from '../data/Data';
 
 export default function Article(props) {

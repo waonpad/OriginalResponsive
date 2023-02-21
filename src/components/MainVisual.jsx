@@ -1,6 +1,5 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
-import { globalTheme } from './Theme';
+import { Box } from '@mui/material';
 
 function MainVisual(props) {
     const {headerElmBoundingClientRect} = props;

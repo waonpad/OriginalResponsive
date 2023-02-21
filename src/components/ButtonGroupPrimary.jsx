@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from "react-router-dom";
 import { Box, Grid, Button, Divider } from '@mui/material';
-import { globalTheme } from './Theme';
+import { globalTheme } from '../Theme';
 
 function ButtonTypeSwitcher(props) {
     const {link, children} = props;
