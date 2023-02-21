@@ -3,8 +3,8 @@ import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import { Box, Typography } from '@mui/material';
-import useElementChildScroll from '../hooks/ElementChildScroll';
-import { useElementClientRect } from '../hooks/ElementClientRect';
+import useElementChildScroll from '../hooks/useElementChildScroll';
+import { useElementClientRect } from '../hooks/useElementClientRect';
 import { itemData } from '../data/Data';
 
 export default function Gallery(props) {

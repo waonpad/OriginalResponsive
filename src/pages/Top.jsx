@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, Container, Grid, Card, Fab, Dialog, Typography, ImageList, ImageListItem, ImageListItemBar } from '@mui/material';
 import CollectionsIcon from '@mui/icons-material/Collections';
-import { useWindowDimensions } from '../hooks/WindowDimensions';
+import { useWindowDimensions } from '../hooks/useWindowDimensions';
 import Agenda from '../components/Agenda';
 import Gallery from '../components/Gallery';
 import ButtonGroupPrimary from '../components/ButtonGroupPrimary';
 import Article from '../components/Article';
-import { useElementClientRect } from '../hooks/ElementClientRect';
-import useElementChildPositions from '../hooks/ElementChildPositions';
+import { useElementClientRect } from '../hooks/useElementClientRect';
+import useElementChildPositions from '../hooks/useElementChildPositions';
 import { itemData } from '../data/Data';
 
 const Top = (props) => {

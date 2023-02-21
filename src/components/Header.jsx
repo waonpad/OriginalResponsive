@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
@@ -15,15 +14,16 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { Backdrop, CircularProgress } from '@mui/material';
-import ViewAgendaIcon from '@mui/icons-material/ViewAgenda';
 import TocIcon from '@mui/icons-material/Toc';
 import Top from '../pages/Top';
 import MainVisual from './MainVisual';
-import { useElementClientRect } from '../hooks/ElementClientRect';
+import SimpleFooter from './SimpleFooter';
+import { useElementClientRect } from '../hooks/useElementClientRect';
 import { sectionsData } from '../data/Data';
 
 const drawerWidth = 270;
-const navItems = ['Home', 'About', 'Contact'];
+// const navItems = ['Home', 'About', 'Contact'];
+const navItems = [];
 
 function Header(props) {
     const { window, children } = props;
@@ -189,6 +189,7 @@ function Header(props) {
                         </Box>
                     </React.Fragment>
                 }
+                <SimpleFooter />
             </Box>
         </Box>
     );
